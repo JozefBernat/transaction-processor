@@ -1,0 +1,9 @@
+<beanio xmlns="http://www.beanio.org/2012/03">
+    <stream name="TransactionList" format="xml">
+        <record name="Transaction" class="com.progressoft.induction.tp.Transaction">
+            <field name="type" xmlType="attribute" />
+            <field name="amount" xmlType="attribute" />
+            <field name="narration" xmlType="attribute" />
+        </record>
+    </stream>
+</beanio>
