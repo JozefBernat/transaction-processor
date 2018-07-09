@@ -2,18 +2,17 @@ package com.progressoft.induction.tp;
 
 import java.math.BigDecimal;
 
-/**
- * Created by Ahmad Y. Saleh on 7/24/17.
- */
-public class Transaction {
+import static java.math.BigDecimal.ZERO;
 
+public class Transaction {
     private String type;
-    private BigDecimal amount;
+    private String amount;
     private String narration;
 
+    public Transaction() { }
     public Transaction(String type, BigDecimal amount, String narration) {
         this.type = type;
-        this.amount = amount;
+        this.amount = amount.toString();
         this.narration = narration;
     }
 
@@ -25,11 +24,11 @@ public class Transaction {
         this.type = type;
     }
 
-    public BigDecimal getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 
@@ -61,4 +60,11 @@ public class Transaction {
         return result;
     }
 
+    BigDecimal readAmount() {
+        try {
+            return new BigDecimal(amount);
+        } catch (NumberFormatException e) {
+            return ZERO;
+        }
+    }
 }

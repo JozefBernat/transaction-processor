@@ -12,20 +12,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Ahmad Y. Saleh on 7/24/17.
- */
 public class CsvTransactionProcessorTest {
 
     private TransactionProcessor csvTransactionProcessor;
 
     @Before
     public void setUp() {
-        csvTransactionProcessor = null;// replace the null with your CSV implementation class
+        csvTransactionProcessor = TransactionProcessor.createCSVTransactionProcessor();// replace the null with your CSV implementation class
     }
 
     @Test
-    public void givenValidCsvStream_WhenImport_ThenReturnTheExpectedTransactions() {
+    public void givenValidCsvStream_WhenImport_ThenReturnTheExpectedTransactions() throws Exception {
         InputStream is = asStream("C,1000,salary\nD,200,rent\nD,800,other");
         csvTransactionProcessor.importTransactions(is);
         List<Transaction> transactions = csvTransactionProcessor.getImportedTransactions();
