@@ -1,6 +1,5 @@
 package com.progressoft.induction.tp;
 
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 
-public class MoreXmlTests {
+public class XmlProcessorTest {
 
     private TransactionProcessor xmlTransactionProcessor;
     private static long totalTime = 0;
@@ -229,10 +228,6 @@ public class MoreXmlTests {
 
         }
         assertThat(violations, containsInAnyOrder(expectedViolations.toArray()));
-    }
-
-    private Transaction newTransaction(String type, BigDecimal amount, String narration) {
-        return new Transaction(type, amount, narration);
     }
 
     private InputStream asStream(String s) {

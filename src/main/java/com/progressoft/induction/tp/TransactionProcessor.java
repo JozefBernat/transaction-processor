@@ -32,6 +32,7 @@ public interface TransactionProcessor {
     }
 
     class TransactionProcessorImpl implements TransactionProcessor {
+
         private static final String CREDIT = "C";
         private static final String DEBIT = "D";
 

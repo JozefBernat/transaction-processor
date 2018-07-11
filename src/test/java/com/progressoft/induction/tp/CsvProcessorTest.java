@@ -7,18 +7,14 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 
-public class CsvTransactionProcessorTest1000 {
+public class CsvProcessorTest {
 
     private TransactionProcessor csvTransactionProcessor;
     long lStartTime;
@@ -28,7 +24,7 @@ public class CsvTransactionProcessorTest1000 {
 
     @Before
     public void setUp() {
-        csvTransactionProcessor = TransactionProcessor.createCSVTransactionProcessor();// replace the null with your CSV implementation class
+        csvTransactionProcessor = TransactionProcessor.createCSVTransactionProcessor();
     }
 
     @AfterClass
@@ -53,11 +49,11 @@ public class CsvTransactionProcessorTest1000 {
         finalTime = finalTime + totalTime;
         List<Transaction> listForCompare = new ArrayList<>();
         for (int i = 0; i < 2000; i++) {
-            listForCompare.add(newTransaction("D", new BigDecimal(200), "rent"));
-            listForCompare.add(newTransaction("C", new BigDecimal(1000), "salary"));
-            listForCompare.add(newTransaction("D", new BigDecimal(800), "other"));
-            listForCompare.add(newTransaction("D", new BigDecimal(801), "salary"));
-            listForCompare.add(newTransaction("D", new BigDecimal(802), "other"));
+            listForCompare.add(new Transaction("D", new BigDecimal(200), "rent"));
+            listForCompare.add(new Transaction("C", new BigDecimal(1000), "salary"));
+            listForCompare.add(new Transaction("D", new BigDecimal(800), "other"));
+            listForCompare.add(new Transaction("D", new BigDecimal(801), "salary"));
+            listForCompare.add(new Transaction("D", new BigDecimal(802), "other"));
         }
         assertThat(transactions, containsInAnyOrder(listForCompare.toArray()));
     }
@@ -160,10 +156,6 @@ public class CsvTransactionProcessorTest1000 {
 
         assertThat(violations, containsInAnyOrder(listToCompare.toArray()));
 
-    }
-
-    private Transaction newTransaction(String type, BigDecimal amount, String narration) {
-        return new Transaction(type, amount, narration);
     }
 
     private InputStream asStream(String s) {
