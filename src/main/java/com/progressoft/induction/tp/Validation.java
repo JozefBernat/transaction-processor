@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Validation {
-    private TransactionForm form;
 
+    private TransactionForm form;
     Validation(TransactionForm form) {
         this.form = form;
     }
 
     List<Violation> isValid() {
+
         String amt = form.getAmount().trim();
         String type = form.getType().trim();
         String narration = form.getNarration();

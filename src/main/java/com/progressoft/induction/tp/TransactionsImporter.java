@@ -2,18 +2,13 @@ package com.progressoft.induction.tp;
 
 import org.beanio.BeanReader;
 import org.beanio.StreamFactory;
-import sun.java2d.InvalidPipeException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public interface TransactionsImporter {
-    void importTransactions(InputStream is);
-    List<Transaction> getImportedTransactions();
-
     static TransactionsImporter.TransactionsImportImpl createCSVTransactionProcessor() {
         return new TransactionsImporter.TransactionsImportImpl("fileMappingCSV.xml");
     }
@@ -22,7 +17,11 @@ public interface TransactionsImporter {
         return new TransactionsImporter.TransactionsImportImpl("fileMappingXML.xml");
     }
 
-    class TransactionsImportImpl implements TransactionsImporter  {
+    void importTransactions(InputStream is);
+
+    List<Transaction> getImportedTransactions();
+
+    class TransactionsImportImpl implements TransactionsImporter {
 
         public final List<Transaction> transactionsList = new ArrayList<>();
         private final String resourceName;
