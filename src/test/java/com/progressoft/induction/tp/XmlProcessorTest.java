@@ -16,16 +16,17 @@ import static org.junit.Assert.assertEquals;
 
 public class XmlProcessorTest {
 
-    private TransactionProcessor xmlTransactionProcessor;
+    private TransactionsImporter xmlTransationsImporter;
+    private TransactionsValidator xmlTransationsValidator;
     private static long totalTime = 0;
 
     @Before
     public void setUp() {
-        xmlTransactionProcessor = TransactionProcessor.createXmlTransactionProcessor();
+        xmlTransationsImporter = TransactionsImporter.createXmlTransactionProcessor();
     }
 
     @AfterClass
-    public static void printResults(){
+    public static void printResults() {
         System.out.println("Total time taken for processor methods : " + totalTime + " Milliseconds");
     }
 
@@ -47,8 +48,10 @@ public class XmlProcessorTest {
 
         long start = System.currentTimeMillis();
 
-        xmlTransactionProcessor.importTransactions(is);
-        List<Transaction> actualTransactions = xmlTransactionProcessor.getImportedTransactions();
+        xmlTransationsImporter.importTransactions(is);
+        List<Transaction> transactions = xmlTransationsImporter.getImportedTransactions();
+        xmlTransationsValidator = new TransactionsValidator.TransactionsValidatorImpl(transactions);
+        List<Transaction> actualTransactions = xmlTransationsImporter.getImportedTransactions();
         List<Transaction> expectedTransactions = new ArrayList<>();
 
         long end = System.currentTimeMillis();
@@ -84,9 +87,9 @@ public class XmlProcessorTest {
 
         long start = System.currentTimeMillis();
 
-        xmlTransactionProcessor.importTransactions(is);
-
-        assertEquals(true, xmlTransactionProcessor.isBalanced());
+        xmlTransationsImporter.importTransactions(is);
+        xmlTransationsValidator = new TransactionsValidator.TransactionsValidatorImpl(xmlTransationsImporter.getImportedTransactions());
+        assertEquals(true, xmlTransationsValidator.isBalanced());
 
         long end = System.currentTimeMillis();
 
@@ -114,9 +117,9 @@ public class XmlProcessorTest {
         InputStream is = asStream(transactionString);
 
         long start = System.currentTimeMillis();
-        xmlTransactionProcessor.importTransactions(is);
-
-        assertEquals(false, xmlTransactionProcessor.isBalanced());
+        xmlTransationsImporter.importTransactions(is);
+        xmlTransationsValidator = new TransactionsValidator.TransactionsValidatorImpl(xmlTransationsImporter.getImportedTransactions());
+        assertEquals(false, xmlTransationsValidator.isBalanced());
 
         long end = System.currentTimeMillis();
 
@@ -131,7 +134,7 @@ public class XmlProcessorTest {
 
         String transactionString = "<TransactionList>\n";
 
-        for(int i = 0; i < 1000; i++)
+        for (int i = 0; i < 1000; i++)
             transactionString = transactionString + "<Transaction type=\"C\" amount=\"1000\" narration=\"salary\" />\n" +
                     "    <Transaction type=\"C\" amount=\"1000\" narration=\"salary\" />\n" +
                     "    <Transaction type=\"D\" amount=\"750\" narration=\"other\" />\n" +
@@ -140,8 +143,8 @@ public class XmlProcessorTest {
 
         transactionString = transactionString + " <Transaction type=\"L\" amount=\"400\" narration=\"rent\" />\n";
 
-        for(int i = 0; i < 1000; i++)
-            transactionString = transactionString +  " <Transaction type=\"C\" amount=\"1000\" narration=\"salary\" />\n" +
+        for (int i = 0; i < 1000; i++)
+            transactionString = transactionString + " <Transaction type=\"C\" amount=\"1000\" narration=\"salary\" />\n" +
                     "    <Transaction type=\"D\" amount=\"750\" narration=\"other\" />\n" +
                     "    <Transaction type=\"D\" amount=\"400\" narration=\"rent\" />\n" +
                     "    <Transaction type=\"C\" amount=\"760\" narration=\"tax\" />\n" +
@@ -150,10 +153,10 @@ public class XmlProcessorTest {
         transactionString = transactionString + "</TransactionList>";
 
         InputStream is = asStream(transactionString);
-
+        xmlTransationsValidator = new TransactionsValidator.TransactionsValidatorImpl(xmlTransationsImporter.getImportedTransactions());
         long start = System.currentTimeMillis();
-        xmlTransactionProcessor.importTransactions(is);
-        List<Violation> violations = xmlTransactionProcessor.validate();
+        xmlTransationsImporter.importTransactions(is);
+        List<Violation> violations = xmlTransationsValidator.validate();
         long end = System.currentTimeMillis();
 
         System.out.println("test 4 : " + (end - start));
@@ -166,7 +169,7 @@ public class XmlProcessorTest {
 
         String transactionString = "<TransactionList>\n";
 
-        for(int i = 0; i < 2000; i++)
+        for (int i = 0; i < 2000; i++)
             transactionString = transactionString + " <Transaction type=\"C\" amount=\"one thousand\" narration=\"salary\" />\n" +
                     "    <Transaction type=\"X\" amount=\"400\" narration=\"rent\" />\n" +
                     "    <Transaction type=\"D\" amount=\"750\" narration=\"other\" />\n" +
@@ -178,8 +181,9 @@ public class XmlProcessorTest {
         InputStream is = asStream(transactionString);
 
         long start = System.currentTimeMillis();
-        xmlTransactionProcessor.importTransactions(is);
-        List<Violation> violations = xmlTransactionProcessor.validate();
+        xmlTransationsImporter.importTransactions(is);
+        xmlTransationsValidator = new TransactionsValidator.TransactionsValidatorImpl(xmlTransationsImporter.getImportedTransactions());
+        List<Violation> violations = xmlTransationsValidator.validate();
 
         long end = System.currentTimeMillis();
 
@@ -188,32 +192,33 @@ public class XmlProcessorTest {
 
         List<Violation> expectedViolations = new ArrayList<>();
 
-        for(int i = 0; i < 2000; i++){
-            expectedViolations.add(new Violation( 1+5*i, "amount"));
-            expectedViolations.add(new Violation(2+5*i, "type"));
+        for (int i = 0; i < 2000; i++) {
+            expectedViolations.add(new Violation(1 + 5 * i, "amount"));
+            expectedViolations.add(new Violation(2 + 5 * i, "type"));
         }
         assertThat(violations, containsInAnyOrder(expectedViolations.toArray()));
     }
 
     @Test
-    public void givenXmlStreamWithMultipleErrorsInSameTransaction_WhenCallingValidate_ThenReportTheProperViolations() throws Exception {
+    public void givenXmlStreamWithMultipleErrorsInSameTransaction_WhenCallingValidate_ThenReportTheProperViolations() {
 
         String transactionString = "<TransactionList>\n";
 
-        for(int i = 0; i < 2000; i++)
+        for (int i = 0; i < 2000; i++)
             transactionString = transactionString + "<Transaction type=\"C\" amount=\"one thousand\" narration=\"salary\" />\n" +
-                "    <Transaction type=\"X\" amount=\"0\" narration=\"rent\" />\n" +
-                "    <Transaction type=\"D\" amount=\"750\" narration=\"other\" />\n" +
-                " <Transaction type=\"C\" amount=\"600\" narration=\"other\" />\n" +
-                "<Transaction type=\"D\" amount=\"300\" narration=\"tax\" />\n";
+                    "    <Transaction type=\"X\" amount=\"0\" narration=\"rent\" />\n" +
+                    "    <Transaction type=\"D\" amount=\"750\" narration=\"other\" />\n" +
+                    " <Transaction type=\"C\" amount=\"600\" narration=\"other\" />\n" +
+                    "<Transaction type=\"D\" amount=\"300\" narration=\"tax\" />\n";
 
         transactionString = transactionString + "</TransactionList>";
 
         InputStream is = asStream(transactionString);
 
         long start = System.currentTimeMillis();
-        xmlTransactionProcessor.importTransactions(is);
-        List<Violation> violations = xmlTransactionProcessor.validate();
+        xmlTransationsImporter.importTransactions(is);
+        xmlTransationsValidator = new TransactionsValidator.TransactionsValidatorImpl(xmlTransationsImporter.getImportedTransactions());
+        List<Violation> violations = xmlTransationsValidator.validate();
         long end = System.currentTimeMillis();
 
         System.out.println("test 6 : " + (end - start));
@@ -221,10 +226,10 @@ public class XmlProcessorTest {
 
         List<Violation> expectedViolations = new ArrayList<>();
 
-        for(int i = 0; i < 2000; i++){
-            expectedViolations.add(new Violation(1+5*i, "amount"));
-            expectedViolations.add(new Violation(2+5*i, "amount"));
-            expectedViolations.add(new Violation(2+5*i, "type"));
+        for (int i = 0; i < 2000; i++) {
+            expectedViolations.add(new Violation(1 + 5 * i, "amount"));
+            expectedViolations.add(new Violation(2 + 5 * i, "amount"));
+            expectedViolations.add(new Violation(2 + 5 * i, "type"));
 
         }
         assertThat(violations, containsInAnyOrder(expectedViolations.toArray()));

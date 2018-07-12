@@ -16,7 +16,8 @@ import static org.junit.Assert.assertEquals;
 
 public class CsvProcessorTest {
 
-    private TransactionProcessor csvTransactionProcessor;
+    private TransactionsImporter csvTransactionProcessor;
+    private TransactionsValidator csvTransactionProcessorValidator;
     long lStartTime;
     long lEndTime;
     long totalTime;
@@ -24,8 +25,9 @@ public class CsvProcessorTest {
 
     @Before
     public void setUp() {
-        csvTransactionProcessor = TransactionProcessor.createCSVTransactionProcessor();
+        csvTransactionProcessor = TransactionsImporter.createCSVTransactionProcessor();
     }
+
 
     @AfterClass
     public static void printOut() {
@@ -33,7 +35,7 @@ public class CsvProcessorTest {
     }
 
     @Test
-    public void givenValidCsvStream_WhenImport_ThenReturnTheExpectedTransactions() throws Exception {
+    public void givenValidCsvStream_WhenImport_ThenReturnTheExpectedTransactions(){
         String isS = "C,1000,salary\nD,200,rent\nD,800,other\nD,801,salary\nD,802,other";
         for (int i = 0; i < 1999; i++) {
             isS = isS + "\nC,1000,salary\nD,200,rent\nD,800,other\nD,801,salary\nD,802,other";
@@ -43,6 +45,7 @@ public class CsvProcessorTest {
         lStartTime = System.currentTimeMillis();
         csvTransactionProcessor.importTransactions(is);
         List<Transaction> transactions = csvTransactionProcessor.getImportedTransactions();
+        csvTransactionProcessorValidator = new TransactionsValidator.TransactionsValidatorImpl(transactions);
         lEndTime = System.currentTimeMillis();
         totalTime = lEndTime - lStartTime;
         System.out.println("Test 1: "+totalTime);
@@ -67,7 +70,8 @@ public class CsvProcessorTest {
         InputStream is = asStream(isS);
         lStartTime = System.currentTimeMillis();
         csvTransactionProcessor.importTransactions(is);
-        assertEquals(true, csvTransactionProcessor.isBalanced());
+        csvTransactionProcessorValidator = new TransactionsValidator.TransactionsValidatorImpl(csvTransactionProcessor.getImportedTransactions());
+        assertEquals(true, csvTransactionProcessorValidator.isBalanced());
         lEndTime = System.currentTimeMillis();
         totalTime = lEndTime - lStartTime;
         System.out.println("Test 2: "+totalTime);
@@ -83,8 +87,8 @@ public class CsvProcessorTest {
         InputStream is = asStream(isS);
         lStartTime = System.currentTimeMillis();
         csvTransactionProcessor.importTransactions(is);
-
-        assertEquals(false, csvTransactionProcessor.isBalanced());
+        csvTransactionProcessorValidator = new TransactionsValidator.TransactionsValidatorImpl(csvTransactionProcessor.getImportedTransactions());
+        assertEquals(false, csvTransactionProcessorValidator.isBalanced());
         lEndTime = System.currentTimeMillis();
         totalTime = lEndTime - lStartTime;
         System.out.println("Test 3: "+totalTime);
@@ -100,7 +104,8 @@ public class CsvProcessorTest {
         InputStream is = asStream(isS);
         lStartTime = System.currentTimeMillis();
         csvTransactionProcessor.importTransactions(is);
-        List<Violation> violations = csvTransactionProcessor.validate();
+        csvTransactionProcessorValidator = new TransactionsValidator.TransactionsValidatorImpl(csvTransactionProcessor.getImportedTransactions());
+        List<Violation> violations = csvTransactionProcessorValidator.validate();
         lEndTime = System.currentTimeMillis();
         totalTime = lEndTime - lStartTime;
         System.out.println("Test 4: "+totalTime);
@@ -117,7 +122,8 @@ public class CsvProcessorTest {
         InputStream is = asStream(isS);
         lStartTime = System.currentTimeMillis();
         csvTransactionProcessor.importTransactions(is);
-        List<Violation> violations = csvTransactionProcessor.validate();
+        csvTransactionProcessorValidator = new TransactionsValidator.TransactionsValidatorImpl(csvTransactionProcessor.getImportedTransactions());
+        List<Violation> violations = csvTransactionProcessorValidator.validate();
 
         List<Violation> listToCompare = new ArrayList<>();
         lEndTime = System.currentTimeMillis();
@@ -141,7 +147,8 @@ public class CsvProcessorTest {
         InputStream is = asStream(isS);
         lStartTime = System.currentTimeMillis();
         csvTransactionProcessor.importTransactions(is);
-        List<Violation> violations = csvTransactionProcessor.validate();
+        csvTransactionProcessorValidator = new TransactionsValidator.TransactionsValidatorImpl(csvTransactionProcessor.getImportedTransactions());
+        List<Violation> violations = csvTransactionProcessorValidator.validate();
         lEndTime = System.currentTimeMillis();
         totalTime = lEndTime - lStartTime;
         System.out.println("Test 6: "+totalTime);

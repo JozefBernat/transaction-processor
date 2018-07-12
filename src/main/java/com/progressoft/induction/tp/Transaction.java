@@ -1,6 +1,9 @@
 package com.progressoft.induction.tp;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -66,5 +69,9 @@ public class Transaction {
         } catch (NumberFormatException e) {
             return ZERO;
         }
+    }
+
+    boolean isOfType(String type) {
+        return this.getType().equals(type);
     }
 }
