@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
 class Validation {
 
     private TransactionForm form;
@@ -26,8 +27,15 @@ class Validation {
             errorsArray.add(new Violation(form.getIndex(), "amount"));
         }
 
-        if (!type.equals("D") && !type.equals("C"))
+        try
+        {
+            Transaction.Type.valueOf(type);
+        }
+        catch(Exception e)
+        {
             errorsArray.add(new Violation(form.getIndex(), "type"));
+        }
+
         if (narration == null || narration.trim().length() == 0)
             errorsArray.add(new Violation(form.getIndex(), "narration"));
         return errorsArray;

@@ -45,7 +45,6 @@ public class XmlProcessorTest {
 
         InputStream is = asStream(transactionString);
 
-
         long start = System.currentTimeMillis();
 
         xmlTransationsImporter.importTransactions(is);

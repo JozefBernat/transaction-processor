@@ -5,15 +5,10 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public interface TransactionsValidator {
-
     List<Violation> validate();
-
     boolean isBalanced();
 
     class TransactionsValidatorImpl implements TransactionsValidator {
-
-        private static final String CREDIT = "C";
-        private static final String DEBIT = "D";
 
         private List<Transaction> transactionsList;
 
@@ -30,7 +25,7 @@ public interface TransactionsValidator {
 
         @Override
         public boolean isBalanced() {
-            return Transaction.sumOf(DEBIT, transactionsList).equals(Transaction.sumOf(CREDIT, transactionsList));
+            return Transaction.sumOf(Transaction.Type.D.toString(), transactionsList).equals(Transaction.sumOf(Transaction.Type.C.toString(), transactionsList));
         }
     }
 }

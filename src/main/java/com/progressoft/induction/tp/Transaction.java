@@ -11,6 +11,10 @@ public class Transaction {
     private String amount;
     private String narration;
 
+    public enum Type {
+        C, D
+    }
+
     public Transaction() {
     }
 
@@ -18,18 +22,6 @@ public class Transaction {
         this.type = type;
         this.amount = amount.toString();
         this.narration = narration;
-    }
-
-    static BigDecimal sumOf(String type, List<Transaction> transactionsList) {
-        return transactionsList.stream().filter(isOfType(type)).map(Transaction::readAmount).reduce(ZERO, BigDecimal::add);
-    }
-
-    static Predicate<Transaction> isOfType(String type) {
-        return tr -> tr.getType().equals(type);
-    }
-
-    static Validation toValidation(int i, Transaction tr) {
-        return new Validation(new TransactionForm(tr.getType(), tr.getAmount(), tr.getNarration(), i + 1));
     }
 
     public String getType() {
@@ -60,11 +52,21 @@ public class Transaction {
         try {
             return new BigDecimal(amount);
         } catch (NumberFormatException e) {
-
             return ZERO;
         }
     }
 
+    static BigDecimal sumOf(String type, List<Transaction> transactionsList) {
+        return transactionsList.stream().filter(isOfType(type)).map(Transaction::readAmount).reduce(ZERO, BigDecimal::add);
+    }
+
+    static Predicate<Transaction> isOfType(String type) {
+        return tr -> tr.getType().equals(type);
+    }
+
+    static Validation toValidation(int i, Transaction tr) {
+        return new Validation(new TransactionForm(tr.getType(), tr.getAmount(), tr.getNarration(), i + 1));
+    }
 
     @Override
     public boolean equals(Object o) {

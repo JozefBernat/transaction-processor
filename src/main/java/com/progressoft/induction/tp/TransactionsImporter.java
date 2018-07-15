@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TransactionsImporter {
+    void importTransactions(InputStream is);
+
+    List<Transaction> getImportedTransactions();
+
     static TransactionsImporter.TransactionsImportImpl createCSVTransactionProcessor() {
         return new TransactionsImporter.TransactionsImportImpl("fileMappingCSV.xml");
     }
@@ -16,10 +20,6 @@ public interface TransactionsImporter {
     static TransactionsImporter.TransactionsImportImpl createXmlTransactionProcessor() {
         return new TransactionsImporter.TransactionsImportImpl("fileMappingXML.xml");
     }
-
-    void importTransactions(InputStream is);
-
-    List<Transaction> getImportedTransactions();
 
     class TransactionsImportImpl implements TransactionsImporter {
 
