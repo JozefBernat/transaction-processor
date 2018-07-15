@@ -3,6 +3,7 @@ package com.progressoft.induction.tp;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -10,6 +11,9 @@ public class Transaction {
     private String type;
     private String amount;
     private String narration;
+
+    static final Predicate<Transaction> IS_DEBIT = tr -> tr.getType().equals(Type.D.name());
+    static final Predicate<Transaction> IS_CREDIT = tr -> tr.getType().equals(Type.C.name());
 
     public enum Type {
         C, D
@@ -48,7 +52,7 @@ public class Transaction {
         this.narration = narration;
     }
 
-    BigDecimal readAmount() {
+    private BigDecimal readAmount() {
         try {
             return new BigDecimal(amount);
         } catch (NumberFormatException e) {
@@ -56,12 +60,12 @@ public class Transaction {
         }
     }
 
-    static BigDecimal sumOf(String type, List<Transaction> transactionsList) {
-        return transactionsList.stream().filter(isOfType(type)).map(Transaction::readAmount).reduce(ZERO, BigDecimal::add);
+    static List<Transaction> filter(List<Transaction> list, Predicate<Transaction> predicate){
+        return list.stream().filter(predicate).collect(Collectors.toList());
     }
 
-    static Predicate<Transaction> isOfType(String type) {
-        return tr -> tr.getType().equals(type);
+    static BigDecimal totalAmount(List<Transaction> list) {
+        return list.stream().map(Transaction::readAmount).reduce(ZERO, BigDecimal::add);
     }
 
     static Validation toValidation(int i, Transaction tr) {
