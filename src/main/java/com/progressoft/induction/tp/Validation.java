@@ -29,7 +29,7 @@ class Validation {
 
         try
         {
-            Transaction.TransactionType.valueOf(type);
+            Transaction.Type.valueOf(type);
         }
         catch(Exception e)
         {
