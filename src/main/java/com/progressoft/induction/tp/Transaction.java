@@ -3,6 +3,7 @@ package com.progressoft.induction.tp;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -11,8 +12,8 @@ public class Transaction {
     private String amount;
     private String narration;
 
-    public enum Type {
-        C, D
+    static List<Transaction> getList(List<Transaction> oldList, String type) {
+        return oldList.stream().filter(isOfType(type)).collect(Collectors.toList());
     }
 
     public Transaction() {
@@ -56,8 +57,12 @@ public class Transaction {
         }
     }
 
-    static BigDecimal sumOf(String type, List<Transaction> transactionsList) {
-        return transactionsList.stream().filter(isOfType(type)).map(Transaction::readAmount).reduce(ZERO, BigDecimal::add);
+    static BigDecimal sumOf(List<Transaction> transactionsList, String type) {
+        return getList(transactionsList, type).stream().map(Transaction::readAmount).reduce(ZERO, BigDecimal::add);
+    }
+
+    protected enum TransactionType {
+        C, D
     }
 
     static Predicate<Transaction> isOfType(String type) {

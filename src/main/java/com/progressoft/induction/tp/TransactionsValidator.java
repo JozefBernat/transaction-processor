@@ -25,7 +25,7 @@ public interface TransactionsValidator {
 
         @Override
         public boolean isBalanced() {
-            return Transaction.sumOf(Transaction.Type.D.toString(), transactionsList).equals(Transaction.sumOf(Transaction.Type.C.toString(), transactionsList));
+            return Transaction.sumOf(transactionsList, Transaction.TransactionType.D.toString()).equals(Transaction.sumOf(transactionsList, Transaction.TransactionType.C.toString()));
         }
     }
 }
